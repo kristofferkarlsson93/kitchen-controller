@@ -15,8 +15,7 @@ import kitchencontroller.formatters._
 import scala.concurrent.ExecutionContext
 
 class TimerRoutes(timerRepository: TimerRepository)(implicit mat: Materializer, system: ActorSystem, executor: ExecutionContext) extends PlayJsonSupport {
-
-
+  
   def getRoutes: Route = {
     pathPrefix("timers") {
       pathEndOrSingleSlash {
