@@ -15,6 +15,8 @@ import kitchencontroller.formatters._
 
 case class TimerDraft(title: String, startedAt: LocalDateTime, endsAt: LocalDateTime)
 
+case class AllTimersRespone(timers: Seq[TimerApiModel])
+
 case class TimerApiModel(id: UUID, title: String, timeToLive: Long)
 
 case class Timer(id: UUID, title: String, startedAt: LocalDateTime, endsAt: LocalDateTime)

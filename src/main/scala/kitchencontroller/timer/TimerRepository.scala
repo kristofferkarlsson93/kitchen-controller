@@ -11,8 +11,11 @@ import format._
 import java.time.temporal.ChronoUnit
 
 import kitchencontroller.formatters._
+import kitchencontroller.routes.TimerNotFound
 
+import scala.collection.immutable
 import scala.concurrent.Future
+import scala.util.Success
 
 class TimerRepository()(implicit mat: Materializer) extends PlayJsonSupport {
   private var timers: Vector[Timer] = Vector()
@@ -23,9 +26,16 @@ class TimerRepository()(implicit mat: Materializer) extends PlayJsonSupport {
     Future.successful(timer)
   }
 
-  def all: Future[Seq[TimerApiModel]] = {
-    timers.map(timer => timerToApiModel(timer))
-    Future.successful(timers.map(timer => timerToApiModel(timer)))
+  def all: Future[AllTimersRespone] = {
+    val timerApiModels = timers.map(timer => timerToApiModel(timer))
+    Future.successful(AllTimersRespone(timerApiModels))
+  }
+
+  def getById(id: UUID): TimerApiModel = {
+    timers.find(timer => timer.id == id) match {
+      case Some(timer) => timerToApiModel(timer)
+      case _ => throw new TimerNotFound(s"Could not find timer with id ${id.toString}")
+    }
   }
 
   def delete(id: UUID): Future[Unit] = {
