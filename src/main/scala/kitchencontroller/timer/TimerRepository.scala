@@ -3,19 +3,15 @@ package kitchencontroller.timer
 import java.time._
 import java.util.UUID
 
-import akka.http.scaladsl.model.DateTime
 import akka.stream.Materializer
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
-import format._
 import java.time.temporal.ChronoUnit
 
 import kitchencontroller.formatters._
 import kitchencontroller.routes.TimerNotFound
 
-import scala.collection.immutable
 import scala.concurrent.Future
-import scala.util.Success
 
 class TimerRepository()(implicit mat: Materializer) extends PlayJsonSupport {
   private var timers: Vector[Timer] = Vector()
