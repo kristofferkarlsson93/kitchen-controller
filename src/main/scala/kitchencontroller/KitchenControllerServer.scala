@@ -20,6 +20,7 @@ object KitchenControllerServer {
   private val timerRoutes = new TimerRoutes(new TimerRepository)
 
   def start(): Unit = {
+    println("Server running on port " + port)
     Http().bindAndHandle(timerRoutes.getRoutes, host, port)
   }
 }

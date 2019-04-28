@@ -15,31 +15,35 @@ import kitchencontroller.formatters._
 import scala.concurrent.ExecutionContext
 
 class TimerRoutes(timerRepository: TimerRepository)
-  (implicit mat: Materializer, system: ActorSystem, executor: ExecutionContext) extends PlayJsonSupport {
+                 (implicit mat: Materializer, system: ActorSystem, executor: ExecutionContext) extends PlayJsonSupport {
+
+  import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
   def getRoutes: Route = {
-    handleExceptions(TimerApiExceptionHandler.handler) {
-      pathPrefix("timers") {
-        pathEndOrSingleSlash {
-          post {
-            entity(as[TimerDraft]) { timerDraft =>
-              onSuccess(timerRepository.create(timerDraft)) { timer =>
-                complete(StatusCodes.Created, timer)
+    cors() {
+      handleExceptions(TimerApiExceptionHandler.handler) {
+        pathPrefix("timers") {
+          pathEndOrSingleSlash {
+            post {
+              entity(as[TimerDraft]) { timerDraft =>
+                onSuccess(timerRepository.create(timerDraft)) { timer =>
+                  complete(StatusCodes.Created, timer)
+                }
               }
+            } ~ get {
+              complete(timerRepository.all)
             }
-          } ~ get {
-            complete(timerRepository.all)
+          } ~ path(Segment) { id: String =>
+            val timerId = UUID.fromString(id)
+            get {
+              complete(timerRepository.getById(timerId))
+            } ~
+              delete {
+                onComplete(timerRepository.delete(timerId)) { _ =>
+                  complete(StatusCodes.NoContent)
+                }
+              }
           }
-        } ~ path(Segment) { id: String =>
-          val timerId = UUID.fromString(id)
-          get {
-            complete(timerRepository.getById(timerId))
-          } ~
-            delete {
-              onComplete(timerRepository.delete(timerId)) { _ =>
-                complete(StatusCodes.NoContent)
-              }
-            }
         }
       }
     }
